@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useGetJobsMutation } from "./redux/api";
 
 function App() {
-  const [offset, setoffset] = useState();
+  const [allJobs, setAllJobs] = useState([]);
+  const [offset, setoffset] = useState(0);
   const [limit, setlimit] = useState(10);
   const [getJobs, { isLoading, isError, isSuccess, data, error }] =
-    useGetJobsMutation(0, 10);
+    useGetJobsMutation(offset, limit);
 
   useEffect(() => {
-    // Perform the getPosts mutation when the component mounts
-    getJobs(0, 10);
+    if (allJobs?.length == 0) {
+      getJobs(940, 10);
+      if (!isLoading && !isError && isSuccess && data) {
+        setAllJobs((prevJobs) => [...prevJobs, ...data.jdList]);
+      }
+    }
   }, []);
-
+  allJobs && console.log(allJobs);
   console.log(data, error);
   return <div></div>;
 }
