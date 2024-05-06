@@ -3,6 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOffset, setTotalCount } from "./redux/jobsSlice";
 import { useGetJobsMutation } from "./redux/api";
 
+import { experimentalStyled as styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import JobCard from "./components/JObCard";
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
+  ...theme.typography.body2,
+  padding: theme.spacing(2),
+  textAlign: "center",
+  color: theme.palette.text.secondary,
+}));
+
 function debounce(func, delay) {
   let timer;
   return function (...args) {
@@ -56,7 +70,7 @@ function App() {
 
   const handelInfiniteScroll = async () => {
     if (
-      window.innerHeight + document.documentElement.scrollTop !==
+      window.innerHeight + document.documentElement.scrollTop + 100 <=
         document.documentElement.offsetHeight ||
       isLoading
     )
@@ -68,14 +82,23 @@ function App() {
 
   return (
     <div className="container">
-      {jobs.map((job, idx) => (
-        <div key={idx} className="card">
-          <div className="cardContent">
-            {/* Render job data */}
-            {job.jobRole} - {job.companyName}
-          </div>
-        </div>
-      ))}
+      <Grid
+        container
+        spacing={{ xs: 2, md: 3 }}
+        columns={{ xs: 4, sm: 8, md: 12 }}
+      >
+        {jobs.map((job, idx) => (
+          <Grid item xs={2} sm={4} md={4} key={idx}>
+            {/* <div className="card">
+              <div className="cardContent">
+                 Render job data 
+                {job?.jobRole} - {job?.companyName}
+              {/* </div> 
+            // </div> */}
+            <JobCard job={job} />
+          </Grid>
+        ))}
+      </Grid>
       {/* Loader element */}
       {end ? (
         <>Thats All</>
