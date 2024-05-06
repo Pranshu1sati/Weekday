@@ -1,108 +1,89 @@
-// import React, { useEffect, useState } from "react";
-// import { useGetJobsMutation } from "./redux/api";
-
-// function App() {
-//   const [allJobs, setAllJobs] = useState([]);
-//   const [offset, setoffset] = useState(0);
-//   // const [limit, setlimit] = useState(10);
-//   const [getJobs, { isLoading, isError, isSuccess, data, error }] =
-//     useGetJobsMutation();
-
-//   useEffect(() => {
-//     // console.log(limit);
-//     getJobs(offset);
-//     if (!isLoading && !isError && isSuccess && data) {
-//       console.log(typeof data.jbList);
-//       setAllJobs(data?.jdList);
-//     }
-//   }, []);
-//   useEffect(() => {
-//     getJobs(offset).then((result) => {
-//       setAllJobs((prevJobs) => [...prevJobs, ...result.data.jdList]);
-//     });
-//   }, [offset]);
-//   // allJobs && console.log("Offset", offset, "Alljobs", allJobs, "\n");
-//   !error && data && console.log(offset, data, error);
-//   allJobs?.length > 0 && console.log(allJobs);
-//   return (
-//     <div>
-//       <button
-//         onClick={() => {
-//           setoffset((prev) => prev + 10);
-//         }}
-//         style={{ backgroundColor: "white", color: "black" }}
-//       >
-//         Refetch {offset}
-//       </button>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setOffset, setTotalCount } from "./redux/jobsSlice";
 import { useGetJobsMutation } from "./redux/api";
 
+function debounce(func, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
 function App() {
-  const [allJobs, setAllJobs] = useState([]);
+  const dispatch = useDispatch();
+
+  const [end, setEnd] = useState(false);
+
+  const { jobs, totalCount } = useSelector((state) => state.jobs);
+
   const [offset, setOffset] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [getJobs] = useGetJobsMutation();
 
+  const [getJobs, { isLoading, isError, error }] = useGetJobsMutation();
   useEffect(() => {
-    const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-
-      if (windowHeight + scrollTop + 10 >= documentHeight) {
-        // Fetch more data when scrolled to the bottom
-        setOffset((prevOffset) => prevOffset + 20);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    fetchData();
   }, []);
 
   useEffect(() => {
-    // Fetch data when offset changes
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const result = await getJobs(offset);
-        setIsLoading(false);
-        setData(result.data);
-        setAllJobs((prevJobs) => [...prevJobs, ...result.data.jdList]);
-      } catch (error) {
-        setIsLoading(false);
-        setIsError(true);
-        setError(error);
-      }
-    };
+    window.addEventListener("scroll", handelInfiniteScroll);
+    return () => window.removeEventListener("scroll", handelInfiniteScroll);
+  }, [isLoading]);
 
+  const fetchData = useCallback(
+    debounce(async () => {
+      if (totalCount <= jobs?.length) {
+        setEnd(true);
+        return;
+      }
+      if (isLoading) return;
+      try {
+        console.log(offset);
+        const result =
+          !isLoading &&
+          (await getJobs(offset).then((result) =>
+            setOffset((prev) => prev + result?.data?.jdList?.length)
+          ));
+        console.log(result);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 500), // Adjust the delay as needed
+    [isLoading, offset]
+  );
+
+  const handelInfiniteScroll = async () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !==
+        document.documentElement.offsetHeight ||
+      isLoading
+    )
+      return;
     fetchData();
-  }, [offset]);
+  };
+
+  console.log(offset, end);
 
   return (
-    <div>
-      {allJobs.map((job, idx) => (
-        <div key={idx}>
-          {/* Render job data */}
-          {job.jobRole} - {job.companyName}
+    <div className="container">
+      {jobs.map((job, idx) => (
+        <div key={idx} className="card">
+          <div className="cardContent">
+            {/* Render job data */}
+            {job.jobRole} - {job.companyName}
+          </div>
         </div>
       ))}
       {/* Loader element */}
-      {isLoading && <div>Loading...</div>}
+      {end ? (
+        <>Thats All</>
+      ) : (
+        isLoading && <div className="loader">Loading...</div>
+      )}
       {/* Error message */}
-      {isError && <div>Error: {error.message}</div>}
+      {isError && <div className="error">Error: {error.message}</div>}
     </div>
   );
 }
