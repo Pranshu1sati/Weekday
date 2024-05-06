@@ -15,7 +15,7 @@ const generateBody = (offset) => {
 };
 
 export const jobsApi = createApi({
-  reducerPath: "weekdayApi",
+  reducerPath: "jobsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://api.weekday.technology/adhoc",
     // prepareHeaders: (headers) => ({ ...headers, ...requestOptions.headers })
@@ -31,17 +31,6 @@ export const jobsApi = createApi({
         method: "POST",
         body: generateBody(offset),
       }),
-      onQueryStarted: async (
-        arg,
-        { dispatch, getState, requestId, queryFulfilled }
-      ) => {
-        try {
-          const { data } = await queryFulfilled;
-          console.log(data);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      },
     }),
   }),
 });
