@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setOffset, setTotalCount } from "./redux/jobsSlice";
 import { useGetJobsMutation } from "./redux/api";
+import { debounce } from "./utils/debounce";
 
 import { experimentalStyled as styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import JobCard from "./components/JObCard";
+import Filters from "./components/Filters";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -17,16 +18,6 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function debounce(func, delay) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
-  };
-}
-
 function App() {
   const dispatch = useDispatch();
 
@@ -35,6 +26,7 @@ function App() {
   const { jobs, totalCount } = useSelector((state) => state.jobs);
 
   const [offset, setOffset] = useState(0);
+  const [allJobs, setAllJobs] = useState(jobs);
 
   const [getJobs, { isLoading, isError, error }] = useGetJobsMutation();
   useEffect(() => {
@@ -78,10 +70,31 @@ function App() {
     fetchData();
   };
 
-  console.log(offset, end);
+  console.log(offset, end, allJobs);
 
   return (
-    <div className="container">
+    <div
+      className="flex flex-col gap-x-1 p-4"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "1rem",
+        columnGap: "0.25rem",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flex: "1",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0.75rem",
+        }}
+      >
+        <Filters />
+      </div>
+
       <Grid
         container
         spacing={{ xs: 2, md: 3 }}
