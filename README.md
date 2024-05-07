@@ -1,4 +1,4 @@
-# WeekDay Assignment Project(Round 1)
+# Weekday Assignment Project(Round 1)
 
 How to run locally.
 
