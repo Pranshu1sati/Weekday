@@ -33,7 +33,10 @@ const jobsSlice = createSlice({
             );
           case "minExp":
             if (!filterValue) return true;
-            return job?.minExp >= filterValue; // Assuming experience field
+            if (job?.minExp === null) return false;
+            const jobMinExp = parseInt(job?.minExp);
+            const filterExp = parseInt(filterValue);
+            return jobMinExp <= filterExp; // Assuming experience field
           case "remote":
             if (typeof filterValue !== "string" && filterValue?.length <= 1)
               return true;
