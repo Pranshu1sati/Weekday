@@ -9,7 +9,7 @@ Before running this project, make sure you have the following installed on your 
 - Node.js
 - npm
 
-## Getting Started with Local Setup
+## Getting Started with the task
 
 0. Live Link for the Project Demo [Click Here🔗](https://663a3363091c680b63f8e735--profound-malasada-04406f.netlify.app/)
 
@@ -22,7 +22,7 @@ Before running this project, make sure you have the following installed on your 
 2. Navigate to the project directory:
 
    ```bash
-   cd weekdy-assign
+   cd weekdy
    ```
 
 3. Install the dependencies:
