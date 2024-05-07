@@ -209,6 +209,19 @@ Before running this project, make sure you have the following installed on your 
 10. Handling Edge Cases
 
     - Offset Value Increasing without data being received
+      The Debounce function and its use
+      ```
+      export function debounce(func, delay) {
+       let timer;
+       return function (...args) {
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+           func.apply(this, args);
+           }, delay);
+           };
+         }
+
+      ```
 
       ````
       const fetchData = useCallback(
