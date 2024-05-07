@@ -253,7 +253,7 @@ Before running this project, make sure you have the following installed on your 
 
       ````
 
-    - Reducers receiving unwanted or null values
+    - Reducers receiving unwanted or null values and handeling null values in data
 
       ````
       //inside reducers
@@ -266,10 +266,15 @@ Before running this project, make sure you have the following installed on your 
                     job?.jobRole?.toLowerCase() ===
                     (filterValue ? filterValue?.toLowerCase() : "")
                     );
-                case "minExp":
-                 //edge case
-                    if (!filterValue) return true;
-                    return job?.minExp >= filterValue; // Assuming experience field
+                 case "minExp":
+                  if (!filterValue) return true;
+                  //if min salary is null compare maxsalary should be greater or equal to than desired salary
+                  if (job?.minExp === null){ 
+                    return parseInt(job?.maxExp)<=parseInt(filterValue);
+                  }
+                  const jobMinExp = parseInt(job?.minExp);
+                  const filterExp = parseInt(filterValue);
+                  return jobMinExp <= filterExp; // Assuming experience field
                 case "remote":
                  //edge case
                     if (!filterValue) return true;
@@ -282,8 +287,14 @@ Before running this project, make sure you have the following installed on your 
 
                 case "minSalary":
                  //edge case
-                    if (!filterValue) return true;
-                    return job?.minJdSalary >= filterValue;
+                     if (!filterValue) return true;
+                     //if min exp is null  max exp should be less than or equal to selected exp
+                     if(job?.minSalary ===null){
+                       const jbMaxSal = parseInt(job?.maxJdSalary)
+                       return jbMaxSal >= parseInt(filterValue);
+                     }
+                     const jdMinSal = parseInt(job?.minJdSalary)
+                     return jdMinSal >= filterValue;
                 case "companyName":
                     //edge case
                     if (!filterValue) return true;
