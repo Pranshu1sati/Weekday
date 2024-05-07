@@ -137,7 +137,7 @@ function App() {
           <Typography variant="h2" gutterBottom>
             No Jobs
           </Typography>
-        </Box>) :  : null
+        </Box>) : null
       }
       {/* Loader element */}
       {end ? (
