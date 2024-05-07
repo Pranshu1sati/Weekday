@@ -19,7 +19,7 @@ const Filters = () => {
 
   const [valueRoleChange, setRoleChange] = useState(null);
   const [valueExpChange, setExpChange] = useState(null);
-  const [valueRemoteChange, setRemoteChange] = useState(false);
+  const [valueRemoteChange, setRemoteChange] = useState(null);
   const [valueCompanies, setCompaniesChange] = useState(null);
   const [valueLocation, setLocationChange] = useState("");
   const [valuePayChange, setPayChange] = useState(null);
