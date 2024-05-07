@@ -121,7 +121,7 @@ function App() {
         ))}
       </Grid>
 
-      {(filteredJobs?.length <1) ?
+      {!isLoading && (filteredJobs?.length <1) ?
          (<Box
           sx={{
             display: "flex",
