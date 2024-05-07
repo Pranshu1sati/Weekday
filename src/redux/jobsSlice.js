@@ -33,7 +33,10 @@ const jobsSlice = createSlice({
             );
           case "minExp":
             if (!filterValue) return true;
-            if (job?.minExp === null) return false;
+            //if min salary is null compare maxsalary should be greater or equal to than desired salary
+            if (job?.minExp === null){ 
+              return parseInt(job?.maxExp)<=parseInt(filterValue);
+            }
             const jobMinExp = parseInt(job?.minExp);
             const filterExp = parseInt(filterValue);
             return jobMinExp <= filterExp; // Assuming experience field
@@ -48,7 +51,13 @@ const jobsSlice = createSlice({
 
           case "minSalary":
             if (!filterValue) return true;
-            return job?.minJdSalary >= filterValue;
+            //if min exp is null  max exp should be less than or equal to selected exp
+            if(jd?.minSalary ===null){
+              const jbMaxSal = parseInt(job?.maxJdSalary)
+              return jbMaxSal >= parseInt(filterValue);
+            }
+            const jdMinSal = parseInt(job?.minJdSalary)
+            return jdMinSal >= filterValue;
           case "companyName":
             if (!filterValue) return true;
             if (typeof filterValue !== "string" && filterValue?.length <= 1)
