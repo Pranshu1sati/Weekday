@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOffset, setTotalCount } from "./redux/jobsSlice";
 import { useGetJobsMutation } from "./redux/api";
 import { debounce } from "./utils/debounce";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { experimentalStyled as styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
@@ -23,7 +25,7 @@ function App() {
 
   const [end, setEnd] = useState(false);
 
-  const { jobs, totalCount } = useSelector((state) => state.jobs);
+  const { jobs, filtered, totalCount } = useSelector((state) => state.jobs);
 
   const [offset, setOffset] = useState(0);
   const [allJobs, setAllJobs] = useState(jobs);
@@ -56,7 +58,7 @@ function App() {
       } catch (error) {
         console.log(error);
       }
-    }, 500), // Adjust the delay as needed
+    }, 100), // Adjust the delay as needed
     [isLoading, offset]
   );
 
@@ -116,7 +118,14 @@ function App() {
       {end ? (
         <>Thats All</>
       ) : (
-        isLoading && <div className="loader">Loading...</div>
+        isLoading && (
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={isLoading}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
+        )
       )}
       {/* Error message */}
       {isError && <div className="error">Error: {error.message}</div>}

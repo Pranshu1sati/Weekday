@@ -28,7 +28,7 @@ const jobsSlice = createSlice({
     setFilter(state, action) {
       const { filterBy, filterValue } = action.payload; // Destructure filter details
 
-      state.filteredJobs = state?.filteredJobs?.filter((job) => {
+      state.filteredJobs = state?.jobs?.filter((job) => {
         switch (filterBy) {
           case "role":
             if (!filterValue) return true;
