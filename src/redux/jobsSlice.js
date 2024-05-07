@@ -8,7 +8,6 @@ const initialState = {
   isLoading: false,
   isError: false,
   error: null,
-
 };
 
 const jobsSlice = createSlice({
@@ -36,6 +35,8 @@ const jobsSlice = createSlice({
             if (!filterValue) return true;
             return job?.minExp >= filterValue; // Assuming experience field
           case "remote":
+            if (typeof filterValue !== "string" && filterValue?.length <= 1)
+              return true;
             if (!filterValue) return true;
             console.log(filterValue);
             return filterValue?.toLowerCase() === "remote"

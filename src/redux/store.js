@@ -7,6 +7,7 @@ export const store = configureStore({
     [jobsApi.reducerPath]: jobsApi.reducer,
     jobs: jobsReducer,
   },
+  //adding bot default middleware and rtk query middleware
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware(),
     jobsApi.middleware,
