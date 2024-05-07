@@ -11,203 +11,206 @@ Before running this project, make sure you have the following installed on your 
 
 ## Getting Started with Local Setup
 
-1.  Clone this repository to your local machine:
+0. Live Link for the Project Demo [Click Here🔗](https://663a3363091c680b63f8e735--profound-malasada-04406f.netlify.app/)
 
-    ```bash
-    git clone https://github.com/Pranshu1sati/Weekday.git
-    ```
+1. Clone this repository to your local machine:
 
-2.  Navigate to the project directory:
+   ```bash
+   git clone https://github.com/Pranshu1sati/Weekday.git
+   ```
 
-    ```bash
-    cd weekdy-assign
-    ```
+2. Navigate to the project directory:
 
-3.  Install the dependencies:
+   ```bash
+   cd weekdy-assign
+   ```
 
-    ```bash
-    npm install/yarn install
-    ```
+3. Install the dependencies:
 
-4.  Start the development server:
+   ```bash
+   npm install/yarn install
+   ```
 
-    ```bash
-    npm run dev/yarn dev
-    ```
+4. Start the development server:
 
-5.  Open your browser and visit [http://localhost:5173](http://localhost:5173) to see the running application.
+   ```bash
+   npm run dev/yarn dev
+   ```
 
-6.  Task understanding & Description Build an Infinite Scroll with filtering functionality using React, Redux, MUI, & CSS
+5. Open your browser and visit [http://localhost:5173](http://localhost:5173) to see the running application.
 
-    - Replicate this UI as closely as possible
-      ![UI Image Provided in Task Doc](./src/assets/UI.png)
+6. Task understanding & Description Build an Infinite Scroll with filtering functionality using React, Redux, MUI, & CSS
 
-7.  Approach and Plan of attack
+   - Replicate this UI as closely as possible
+     ![UI Image Provided in Task Doc](./src/assets/UI.png)
 
-    - Set UP Redux Toolkit Query Api Slice to fetch data
-    - Set up login for offset and limit
-    - Bind the API Slice with Redux Store
-    - Build Extra Reducers for storing new data from api slice in redux store
-    - Build Reducers for filtering the data
+7. Approach and Plan of attack
 
-8.  Api Slice and Store binding
+   - Set UP Redux Toolkit Query Api Slice to fetch data
+   - Set up login for offset and limit
+   - Bind the API Slice with Redux Store
+   - Build Extra Reducers for storing new data from api slice in redux store
+   - Build Reducers for filtering the data
 
-    - Job Slice
+8. Api Slice and Store binding
 
-    ```
-    import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-     const myHeaders = {
-     "Content-Type": "application/json",
-     };
+   - Job Slice
 
-     const generateBody = (offset) => {
-     console.log("Offset: ", offset);
-     const body = JSON.stringify({
-     offset: offset ? offset : 0,
-     limit: 20,
-     });
-     console.log(body);
-     return body;
-     };
+   ```
+   import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+    const myHeaders = {
+    "Content-Type": "application/json",
+    };
 
-     export const jobsApi = createApi({
-     reducerPath: "jobsApi",
-     baseQuery: fetchBaseQuery({
-     baseUrl: "https://api.weekday.technology/adhoc",
-     // prepareHeaders: (headers) => ({ ...headers, ...requestOptions.headers })
-     }),
-     endpoints: (builder) => ({
-     // Use mutation instead of query
-     getJobs: builder.mutation({
-     query: (offset) => ({
-     headers: {
-     "Content-type": "application/json",
-     },
-     url: "/getSampleJdJSON",
-     method: "POST",
-     body: generateBody(offset),
-     }),
-     }),
-     }),
-     });
-    ```
+    const generateBody = (offset) => {
+    console.log("Offset: ", offset);
+    const body = JSON.stringify({
+    offset: offset ? offset : 0,
+    limit: 20,
+    });
+    console.log(body);
+    return body;
+    };
 
-    - Store
+    export const jobsApi = createApi({
+    reducerPath: "jobsApi",
+    baseQuery: fetchBaseQuery({
+    baseUrl: "https://api.weekday.technology/adhoc",
+    // prepareHeaders: (headers) => ({ ...headers, ...requestOptions.headers })
+    }),
+    endpoints: (builder) => ({
+    // Use mutation instead of query
+    getJobs: builder.mutation({
+    query: (offset) => ({
+    headers: {
+    "Content-type": "application/json",
+    },
+    url: "/getSampleJdJSON",
+    method: "POST",
+    body: generateBody(offset),
+    }),
+    }),
+    }),
+    });
+   ```
 
-    ```
-    import { configureStore } from "@reduxjs/toolkit";
-    import { jobsApi } from "./api";
-    import { jobsReducer } from "./jobsSlice";
+   - Store
 
-    export const store = configureStore({
-    reducer: {
-        [jobsApi.reducerPath]: jobsApi.reducer,
-        jobs: jobsReducer,
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+   import { jobsApi } from "./api";
+   import { jobsReducer } from "./jobsSlice";
+
+   export const store = configureStore({
+   reducer: {
+       [jobsApi.reducerPath]: jobsApi.reducer,
+       jobs: jobsReducer,
+       },
+       //adding bot default middleware and rtk query middleware
+       middleware: (getDefaultMiddleware) => [
+           ...getDefaultMiddleware(),
+           jobsApi.middleware,
+       ],
+   });
+
+   ```
+
+9. Filtering Logic
+
+   - Store
+
+   ```
+    const jobsSlice = createSlice({
+    name: "jobs",
+    initialState,
+    reducers: {
+        setOffset(state, action) {
+        state.offset = action.payload;
         },
-        //adding bot default middleware and rtk query middleware
-        middleware: (getDefaultMiddleware) => [
-            ...getDefaultMiddleware(),
-            jobsApi.middleware,
-        ],
+        setTotalCount(state, action) {
+        state.totalCount = action.payload;
+        },
+        setFilter(state, action) {
+        const { filterBy, filterValue } = action.payload; // Destructure filter details
+
+        state.filteredJobs = state?.jobs?.filter((job) => {
+            switch (filterBy) {
+            case "role":
+                if (!filterValue) return true;
+                return (
+                job?.jobRole?.toLowerCase() ===
+                (filterValue ? filterValue?.toLowerCase() : "")
+                );
+            case "minExp":
+                if (!filterValue) return true;
+                return job?.minExp >= filterValue; // Assuming experience field
+            case "remote":
+                if (!filterValue) return true;
+                if (typeof filterValue !== "string" && filterValue?.length <= 1)
+                    return true;
+                console.log(filterValue);
+                return filterValue?.toLowerCase() === "remote"
+                ? job?.location?.toLowerCase() === "remote"
+                : job?.location?.toLowerCase() !== "remote";
+
+            case "minSalary":
+                if (!filterValue) return true;
+                return job?.minJdSalary >= filterValue;
+            case "companyName":
+                if (!filterValue) return true;
+                if (typeof filterValue !== "string" && filterValue?.length <= 1)
+                return true;
+                return job?.companyName
+                .toLowerCase()
+                .includes(filterValue.toLowerCase());
+            case "location":
+                if (!filterValue) return true;
+                if (typeof filterValue !== "string" && filterValue?.length <= 1)
+                return true;
+                else
+                return job?.location
+                    ?.toLowerCase()
+                    .includes(filterValue.toLowerCase());
+            default:
+                return true;
+            }
+        });
+        },
+        clearFilters(state) {
+        state.filteredJobs = []; // Reset filteredJobs to empty array
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+        .addMatcher(jobsApi.endpoints.getJobs.matchPending, (state, action) => {
+            state.isLoading = true;
+            state.isError = false; // Reset error state when a new request starts
+            state.error = null;
+        })
+        .addMatcher(jobsApi.endpoints.getJobs.matchFulfilled, (state, action) => {
+            state.jobs = [...state.jobs, ...action.payload.jdList];
+            state.filteredJobs = [...state.filteredJobs, ...action.payload.jdList];
+            state.totalCount = action.payload.totalCount;
+            state.isLoading = false;
+            state.isError = false;
+            state.error = null;
+            // state.filteredJobs = [...filteredJobs, ...action.payload.jdList];
+        })
+        .addMatcher(jobsApi.endpoints.getJobs.matchRejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.error = action.error;
+        });
+    },
     });
 
-    ```
-
-9.  Filtering Logic
-
-    - Store
-
-    ```
-     const jobsSlice = createSlice({
-     name: "jobs",
-     initialState,
-     reducers: {
-         setOffset(state, action) {
-         state.offset = action.payload;
-         },
-         setTotalCount(state, action) {
-         state.totalCount = action.payload;
-         },
-         setFilter(state, action) {
-         const { filterBy, filterValue } = action.payload; // Destructure filter details
-
-         state.filteredJobs = state?.jobs?.filter((job) => {
-             switch (filterBy) {
-             case "role":
-                 if (!filterValue) return true;
-                 return (
-                 job?.jobRole?.toLowerCase() ===
-                 (filterValue ? filterValue?.toLowerCase() : "")
-                 );
-             case "minExp":
-                 if (!filterValue) return true;
-                 return job?.minExp >= filterValue; // Assuming experience field
-             case "remote":
-                 if (!filterValue) return true;
-                 if (typeof filterValue !== "string" && filterValue?.length <= 1)
-                     return true;
-                 console.log(filterValue);
-                 return filterValue?.toLowerCase() === "remote"
-                 ? job?.location?.toLowerCase() === "remote"
-                 : job?.location?.toLowerCase() !== "remote";
-
-             case "minSalary":
-                 if (!filterValue) return true;
-                 return job?.minJdSalary >= filterValue;
-             case "companyName":
-                 if (!filterValue) return true;
-                 if (typeof filterValue !== "string" && filterValue?.length <= 1)
-                 return true;
-                 return job?.companyName
-                 .toLowerCase()
-                 .includes(filterValue.toLowerCase());
-             case "location":
-                 if (!filterValue) return true;
-                 if (typeof filterValue !== "string" && filterValue?.length <= 1)
-                 return true;
-                 else
-                 return job?.location
-                     ?.toLowerCase()
-                     .includes(filterValue.toLowerCase());
-             default:
-                 return true;
-             }
-         });
-         },
-         clearFilters(state) {
-         state.filteredJobs = []; // Reset filteredJobs to empty array
-         },
-     },
-     extraReducers: (builder) => {
-         builder
-         .addMatcher(jobsApi.endpoints.getJobs.matchPending, (state, action) => {
-             state.isLoading = true;
-             state.isError = false; // Reset error state when a new request starts
-             state.error = null;
-         })
-         .addMatcher(jobsApi.endpoints.getJobs.matchFulfilled, (state, action) => {
-             state.jobs = [...state.jobs, ...action.payload.jdList];
-             state.filteredJobs = [...state.filteredJobs, ...action.payload.jdList];
-             state.totalCount = action.payload.totalCount;
-             state.isLoading = false;
-             state.isError = false;
-             state.error = null;
-             // state.filteredJobs = [...filteredJobs, ...action.payload.jdList];
-         })
-         .addMatcher(jobsApi.endpoints.getJobs.matchRejected, (state, action) => {
-             state.isLoading = false;
-             state.isError = true;
-             state.error = action.error;
-         });
-     },
-     });
-
-    ```
+   ```
 
 10. Handling Edge Cases
 
     - Offset Value Increasing without data being received
-      ```
+
+      ````
       const fetchData = useCallback(
       //causing intentional so that data is fetched smoothly and not immediately after the first call is fulfilled
 
@@ -221,8 +224,11 @@ Before running this project, make sure you have the following installed on your 
                     ....
                 ```
 
+      ````
+
     - Multiple Requests Creating Race Conditions
-      ```
+
+      ````
       const fetchData = useCallback(
       ...
       // other code
@@ -232,8 +238,11 @@ Before running this project, make sure you have the following installed on your 
                     ....
                 ```
 
+      ````
+
     - Reducers receiving unwanted or null values
-      ```
+
+      ````
       //inside reducers
 
             switch (filterBy) {
@@ -283,3 +292,4 @@ Before running this project, make sure you have the following installed on your 
                     return true;
                 }
             ```
+      ````
