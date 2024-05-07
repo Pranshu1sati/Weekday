@@ -52,7 +52,7 @@ const jobsSlice = createSlice({
           case "minSalary":
             if (!filterValue) return true;
             //if min exp is null  max exp should be less than or equal to selected exp
-            if(jd?.minSalary ===null){
+            if(job?.minSalary ===null){
               const jbMaxSal = parseInt(job?.maxJdSalary)
               return jbMaxSal >= parseInt(filterValue);
             }
