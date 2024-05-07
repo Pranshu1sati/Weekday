@@ -120,6 +120,25 @@ function App() {
           </Grid>
         ))}
       </Grid>
+
+      {(filteredJobs?.length <1) ?
+         (<Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            p: 1,
+            m: 1,
+            bgcolor: "background.paper",
+            height: 100,
+            borderRadius: 1,
+          }}
+        >
+          {" "}
+          <Typography variant="h2" gutterBottom>
+            No Jobs
+          </Typography>
+        </Box>) :  : null
+      }
       {/* Loader element */}
       {end ? (
         <Box
