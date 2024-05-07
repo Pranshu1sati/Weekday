@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const myHeaders = {
   "Content-Type": "application/json",
 };
-
+// To send offset 0 for first api call and actual values after the first calls
 const generateBody = (offset) => {
   console.log("Offset: ", offset);
   const body = JSON.stringify({

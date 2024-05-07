@@ -8,11 +8,7 @@ const initialState = {
   isLoading: false,
   isError: false,
   error: null,
-  //   selectedRole: null,
-  //   selectedMinExp: null,
-  //   remote: null,
-  //   miniSalasy: null,
-  //   companyName: null,
+
 };
 
 const jobsSlice = createSlice({

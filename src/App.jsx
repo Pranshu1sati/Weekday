@@ -11,6 +11,7 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import JobCard from "./components/JObCard";
 import Filters from "./components/Filters";
+import { Box, Typography } from "@mui/material";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -25,7 +26,7 @@ function App() {
 
   const [end, setEnd] = useState(false);
 
-  const { jobs, filtered, totalCount } = useSelector((state) => state.jobs);
+  const { jobs, filteredJobs, totalCount } = useSelector((state) => state.jobs);
 
   const [offset, setOffset] = useState(0);
   const [allJobs, setAllJobs] = useState(jobs);
@@ -41,14 +42,19 @@ function App() {
   }, [isLoading]);
 
   const fetchData = useCallback(
+    //causing intentional so that data is fetched smoothly and not immediately after the first call is fulfilled
+
     debounce(async () => {
+      // return when last job is reached
       if (totalCount <= jobs?.length) {
         setEnd(true);
         return;
       }
+      // no requests while the status is already loading
       if (isLoading) return;
       try {
         console.log(offset);
+        // to ensure no request is made when status is already loading
         const result =
           !isLoading &&
           (await getJobs(offset).then((result) =>
@@ -102,7 +108,7 @@ function App() {
         spacing={{ xs: 2, md: 3 }}
         columns={{ xs: 4, sm: 8, md: 12 }}
       >
-        {jobs.map((job, idx) => (
+        {filteredJobs?.map((job, idx) => (
           <Grid item xs={2} sm={4} md={4} key={idx}>
             {/* <div className="card">
               <div className="cardContent">
@@ -116,7 +122,22 @@ function App() {
       </Grid>
       {/* Loader element */}
       {end ? (
-        <>Thats All</>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            p: 1,
+            m: 1,
+            bgcolor: "background.paper",
+            height: 100,
+            borderRadius: 1,
+          }}
+        >
+          {" "}
+          <Typography variant="h2" gutterBottom>
+            No More Jobs
+          </Typography>
+        </Box>
       ) : (
         isLoading && (
           <Backdrop

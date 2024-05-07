@@ -107,7 +107,7 @@ const Filters = () => {
     console.log(event?.target?.value);
     const value = event?.target?.value;
     setLocationChange(value);
-    // Call debounced dispatch function
+    //causing intentional delay so that filtering only happens when the typing is stopped
     if (value.trim() !== "") {
       debouncedDispatch(value);
     }
