@@ -11,7 +11,7 @@ Before running this project, make sure you have the following installed on your 
 
 ## Getting Started with the task
 
-0. Live Link for the Project Demo [Click Here🔗](https://663a3363091c680b63f8e735--profound-malasada-04406f.netlify.app/)
+0. Live Link for the Project Demo [Click Here🔗](https://wondrous-macaron-912a75.netlify.app)
 
 1. Clone this repository to your local machine:
 
